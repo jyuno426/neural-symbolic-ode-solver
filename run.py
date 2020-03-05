@@ -4,7 +4,9 @@ from datagen import *
 from sympy import *
 import time
 from datetime import timedelta
-import slack
+
+# import slack
+
 
 def print_progress_bar(
     iteration,
@@ -42,12 +44,12 @@ def slack_message(message, channel):
         "xoxp-880429464020-868103546978-870635433953-b3c779132c2eeb887cb6971d7091836f"
     )
 
-    client = slack.WebClient(token=token)
+    # client = slack.WebClient(token=token)
 
-    response = client.chat_postMessage(channel=channel, text=message)
+    # response = client.chat_postMessage(channel=channel, text=message)
 
-    assert response["ok"]
-    assert response["message"]["text"] == message
+    # assert response["ok"]
+    # assert response["message"]["text"] == message
 
     print('successfully post message "' + message + '" to ' + channel)
 
@@ -57,16 +59,24 @@ def slack_message(message, channel):
 # f.close()
 # g.close()
 
-f = open("./dataset/integration-input", "r")
-g = open("./dataset/integration-output", "r")
 n = int(2e4)
 
-i = len(f.readlines())
-j = len(g.readlines())
-assert i == j
+try:
+    f = open("./dataset/integration-input", "r")
+    g = open("./dataset/integration-output", "r")
+    i = len(f.readlines())
+    j = len(g.readlines())
+    assert i == j
+    f.close()
+    g.close()
+except:
+    f = open("./dataset/integration-input", "w")
+    g = open("./dataset/integration-output", "w")
+    i = 0
+    j = 0
+    f.close()
+    g.close()
 
-f.close()
-g.close()
 
 f = open("./dataset/integration-input", "a+")
 g = open("./dataset/integration-output", "a+")

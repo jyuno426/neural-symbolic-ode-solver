@@ -49,7 +49,7 @@ unary_operations = [
     atanh,
 ]
 
-max_internal_node_size = 8
+max_internal_node_size = 15
 
 # operation_name_to_symbol = {
 #     "Add": "+",

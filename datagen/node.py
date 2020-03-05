@@ -43,10 +43,10 @@ class Node(object):
                 )
             else:
                 raise Exception("get_sympy_exp error, invalid data: " + str(self.data))
-            try:
-                self.exp = simplify(self.exp)
-            except:
-                print(self.exp)
+            # try:
+            #     self.exp = simplify(self.exp)
+            # except:
+            #     print(self.exp)
 
         return self.exp
 
@@ -60,7 +60,8 @@ class Node(object):
 
     def is_real(self):
         # assert not self.has_symbols()
-        return self.get_sympy_exp().is_real
+        self.exp = simplify(self.get_sympy_exp())
+        return self.exp.is_real
 
     def __str__(self):
         try:
