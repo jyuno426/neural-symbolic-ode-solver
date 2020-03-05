@@ -4,7 +4,7 @@ from datagen import *
 from sympy import *
 import time
 from datetime import timedelta
-
+import slack
 
 def print_progress_bar(
     iteration,
@@ -52,18 +52,31 @@ def slack_message(message, channel):
     print('successfully post message "' + message + '" to ' + channel)
 
 
-f = open("./dataset/integration-input", "w")
-g = open("./dataset/integration-output", "w")
+# f = open("./dataset/integration-input", "w")
+# g = open("./dataset/integration-output", "w")
+# f.close()
+# g.close()
+
+f = open("./dataset/integration-input", "r")
+g = open("./dataset/integration-output", "r")
+n = int(2e4)
+
+i = len(f.readlines())
+j = len(g.readlines())
+assert i == j
+
 f.close()
 g.close()
 
 f = open("./dataset/integration-input", "a+")
 g = open("./dataset/integration-output", "a+")
-n = int(10e5)
 
+
+print(i)
+
+slack_message("datagen start", "#laboratory")
 start_time = time.time()
 
-i = 0
 while i < n:
     tree = Tree(random_generate=True, always_valid=True, function_of_x=True)
     try:
