@@ -142,18 +142,18 @@ def traverse_in_preorder(node):
 
 
 def match_prefix(sentence, candidates):
-    try:
-        prefix = None
-        for candidate in candidates:
-            if sentence.startswith(candidate):
-                prefix = candidate
-                break
-        assert prefix is not None
-    except AssertionError:
-        print("sentence:", sentence)
-        print("candidates:", [str(candidate) for candidate in candidates])
-        print("Holy")
-        assert 0 == 1
+    # try:
+    prefix = None
+    for candidate in candidates:
+        if sentence.startswith(candidate):
+            prefix = candidate
+            break
+    assert prefix is not None
+    # except AssertionError:
+    #     print("Prefix Error")
+    #     print("sentence:", sentence)
+    #     print("candidates:", [str(candidate) for candidate in candidates])
+    #     assert 0 == 1
     return prefix
 
 
