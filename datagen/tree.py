@@ -48,11 +48,11 @@ class Tree(object):
 
     def get_simplified_derivative(self):
         derivative = diff(self.get_sympy_exp())
-        return str(simplify(derivative, ratio=oo)).replace(" ", "").strip()
+        return str(simplify(derivative)).replace(" ", "").strip()
 
     def get_simplified_without_constant(self):
         expr_without_constant = separate_constant_term(self.get_sympy_exp(), var=x)[1]
-        return str(simplify(expr_without_constant, ratio=oo)).replace(" ", "").strip()
+        return str(simplify(expr_without_constant)).replace(" ", "").strip()
 
     def __str__(self):
         # traverse = traverse_in_preorder(self.root)

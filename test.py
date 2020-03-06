@@ -1,54 +1,127 @@
 # -*- coding: utf-8 -*-
 
-from datagen.utils import parse_simplified_string_exprssion_into_tree
-from contextlib import contextmanager
-from datetime import timedelta
+from utility import *
 from datagen import *
 from sympy import *
-import warnings
-import signal
-import slack
+from datetime import date
 import time
+import sys
 
-warnings.filterwarnings("error")
-
-
-class TimeoutException(Exception):
-    pass
+today = date.today().strftime("%b-%d-%Y")
 
 
-@contextmanager
-def time_limit(seconds):
-    def signal_handler(signum, frame):
-        raise TimeoutException
+def generate_integration_dataset(n=int(2e4)):
+    start_time = time.time()
+    slack_message("Start integration dataset generation: n=" + str(n))
 
-    signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(seconds)
-    try:
-        yield
-    finally:
-        signal.alarm(0)
-
-
-i = 0
-n = int(2e4)
-while i < n:
-    tree = Tree(random_generate=True, always_valid=True)
-
-    try:
-        with time_limit(5):
-            input_string = tree.get_simplified_derivative()
-            output_string = tree.get_simplified_without_constant()
-    except TimeoutException:
-        # print("Timed out! Restart!", end="                                          ")
-        continue
-
-    # print("input_trans:\t", parse_simplified_string_exprssion_into_tree(input_string))
-    # print("input_origin:\t", input_string)
-    print(
-        "output_trans:\t",
-        Tree(parse_simplified_string_exprssion_into_tree(output_string)),
+    input_raw = (
+        "./dataset/raw-integration-input-" + str(max_internal_node_size) + "-" + today
     )
-    print("output_origin:\t", output_string)
+    output_raw = (
+        "./dataset/raw-integration-output-" + str(max_internal_node_size) + "-" + today
+    )
 
-    break
+    input_final = (
+        "./dataset/final-integration-input-" + str(max_internal_node_size) + "-" + today
+    )
+    output_final = (
+        "./dataset/final-integration-output-"
+        + str(max_internal_node_size)
+        + "-"
+        + today
+    )
+    try:
+        f = open(input_raw, "r")
+        g = open(output_raw, "r")
+        i = len(f.readlines())
+        j = len(g.readlines())
+        f.close()
+        g.close()
+    except:
+        i = 0
+        j = 0
+
+    assert i == j
+
+    if n < i:
+        n = i
+        print("current cnt:", n)
+
+    # parse to sympy format
+    while i < n:
+        input_string, output_string = parse_raw_integration_data()
+
+        f = open(input_raw, "a+")
+        g = open(output_raw, "a+")
+        f.write(input_string + "\n")
+        g.write(output_string + "\n")
+        f.close()
+        g.close()
+
+        i += 1
+
+        message = print_progress_bar(
+            iteration=i,
+            total=n,
+            prefix="raw data generation-" + str(i) + "/" + str(n) + ":",
+            start_time=start_time,
+            current_time=time.time(),
+            length=20,
+        )
+
+        if i % 1000 == 0:
+            slack_message(message)
+
+    # parse to our format
+    f = open(input_raw, "r")
+    g = open(output_raw, "r")
+    input_list = [line.strip() for line in f.readlines()]
+    output_list = [line.strip() for line in g.readlines()]
+    f.close()
+    g.close()
+
+    assert len(input_list) == n
+    assert len(output_list) == n
+
+    f = open(input_final, "w")
+    g = open(output_final, "w")
+
+    for i in range(n):
+        try:
+            input_string, output_string = parse_integration_data(
+                input_list[i], output_list[i]
+            )
+        except:
+            print("Error occured!")
+            print("input:\t", input_list[i])
+            print("output:\t", output_list[i])
+
+        f.write(input_string + "\n")
+        g.write(output_string + "\n")
+
+        i += 1
+
+        message = print_progress_bar(
+            iteration=i,
+            total=n,
+            prefix="final data generation-" + str(i) + ":",
+            start_time=start_time,
+            current_time=time.time(),
+            length=20,
+        )
+
+        if i % 1000 == 0:
+            slack_message(message)
+
+    f.close()
+    g.close()
+
+
+if __name__ == "__main__":
+    if len(sys.argv) <= 1:
+        generate_integration_dataset()
+    else:
+        data_cnt = int(sys.argv[1])
+        assert data_cnt > 0
+        generate_integration_dataset(n=data_cnt)
+

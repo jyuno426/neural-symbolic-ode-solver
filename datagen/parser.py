@@ -14,11 +14,10 @@ warnings.filterwarnings("error")
 
 
 def parse_raw_integration_data():
-    tree = Tree(random_generate=True, always_valid=True)
-
     while True:
         try:
             with time_limit(5):
+                tree = Tree(random_generate=True, always_valid=True)
                 input_string = tree.get_simplified_derivative()
                 output_string = tree.get_simplified_without_constant()
             break
@@ -34,8 +33,8 @@ def parse_raw_integration_data():
 
 def parse_integration_data(input_string, output_string):
     return [
-        str(parse_simplified_string_expression_into_tree(input_string)),
-        str(parse_simplified_string_expression_into_tree(output_string)),
+        str(Tree(parse_simplified_string_expression_into_tree(input_string))),
+        str(Tree(parse_simplified_string_expression_into_tree(output_string))),
     ]
 
 
@@ -91,9 +90,8 @@ def parse_simplified_string_expression_into_tree(string_expression):
         s = string_expression[0]
         if s == "(":
             # ()
-            assert string_expression[-1] == ")"
-
             # print("par: ", string_expression)
+            assert string_expression[-1] == ")"
             if minus:
                 node.set(Mul)
                 node.add_child(data=S(-1))
@@ -108,8 +106,8 @@ def parse_simplified_string_expression_into_tree(string_expression):
                 )
         elif s == "x":
             # x
-            assert len(string_expression) == 1
             # print("variable: ", string_expression)
+            assert len(string_expression) == 1
 
             if minus:
                 node.set(Mul)
@@ -119,8 +117,8 @@ def parse_simplified_string_expression_into_tree(string_expression):
                 node.set(x)
         elif string_expression[:2] == "pi":
             # pi
-            assert len(string_expression) == 2
             # print("const: ", string_expression)
+            assert len(string_expression) == 2
 
             if minus:
                 node.set(Mul)
@@ -130,8 +128,8 @@ def parse_simplified_string_expression_into_tree(string_expression):
                 node.set(pi)
         elif s == "E":
             # E
-            assert len(string_expression) == 1
             # print("const: ", string_expression)
+            assert len(string_expression) == 1
 
             if minus:
                 node.set(Mul)
@@ -141,11 +139,11 @@ def parse_simplified_string_expression_into_tree(string_expression):
                 node.set(E)
         elif s in "0123456789":
             # num
+            # print("num:", string_expression, len(string_expression))
             assert len(string_expression) == len(
                 [c for c in string_expression if c in "0123456789"]
             )
 
-            # print("num:", string_expression)
             if minus:
                 node.set(S(-int(string_expression)))
             else:
@@ -153,8 +151,8 @@ def parse_simplified_string_expression_into_tree(string_expression):
         else:
             # unary
             op = match_prefix(string_expression, unary_list)
-            assert string_expression[len(op)] == "(" and string_expression[-1] == ")"
             # print("unary: ", op)
+            assert string_expression[len(op)] == "(" and string_expression[-1] == ")"
 
             if minus:
                 node.set(Mul)

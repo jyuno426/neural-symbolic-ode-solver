@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from .constants import *
-from .tree import *
 from .node import *
 from sympy import *
 import numpy as np
@@ -147,8 +146,11 @@ def match_prefix(sentence, candidates):
         if sentence.startswith(candidate):
             prefix = candidate
             break
-    assert prefix is not None
-    return prefix
+    if prefix is None:
+        print("It contains", sentence, "\n")
+        raise Exception("match_prefix error")
+    else:
+        return prefix
 
 
 def separate_constant_term(expr, var=None):
