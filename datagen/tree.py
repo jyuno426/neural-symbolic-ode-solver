@@ -13,17 +13,17 @@ class Tree(object):
     def __init__(
         self,
         root=None,
+        always_valid=False,
         random_generate=False,
         internal_node_size=None,
-        always_valid=False,
     ):
         self.simplified_exp = None
         if random_generate:
             # self.root = Node(x)
-            self.root = generate_random_tree()
+            self.root = generate_random_tree(internal_node_size)
             if always_valid:
                 while not self.is_valid():
-                    self.root = generate_random_tree()
+                    self.root = generate_random_tree(internal_node_size)
         else:
             # Make sure that root is valid node
             assert type(root) is Node

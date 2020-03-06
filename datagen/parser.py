@@ -13,11 +13,15 @@ __all__ = ["parse_raw_integration_data", "parse_integration_data"]
 warnings.filterwarnings("error")
 
 
-def parse_raw_integration_data():
+def parse_raw_integration_data(internal_node_size):
     while True:
         try:
             with time_limit(5):
-                tree = Tree(random_generate=True, always_valid=True)
+                tree = Tree(
+                    internal_node_size=internal_node_size,
+                    random_generate=True,
+                    always_valid=True,
+                )
                 input_string = tree.get_simplified_derivative()
                 output_string = tree.get_simplified_without_constant()
             break
