@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .constants import *
-from .utils import *
+from .gen_utils import *
 from sympy import *
 import numpy as np
 
@@ -20,8 +20,11 @@ class Node(object):
     def is_internal(self):
         return not self.is_leaf()
 
-    def add_child(self, data=None):
-        new_child = data if type(data) is Node else Node(data)
+    def add_child(self, data=None, node=None):
+        if type(node) is Node:
+            new_child = node
+        else:
+            new_child = Node(data)
         self.children.append(new_child)
         return new_child
 
@@ -43,25 +46,29 @@ class Node(object):
                 )
             else:
                 raise Exception("get_sympy_exp error, invalid data: " + str(self.data))
-            # try:
-            #     self.exp = simplify(self.exp)
-            # except:
-            #     print(self.exp)
 
         return self.exp
 
     def has_symbols(self):
         return len(self.get_sympy_exp().free_symbols) > 0
 
-    # def evaluate(self, x_val=None):
-    #     assert x_val is None
-    #     # evaluate for x is not allowed yet
-    #     return self.get_sympy_exp().evalf()
-
     def is_real(self):
-        # assert not self.has_symbols()
-        self.exp = simplify(self.get_sympy_exp())
-        return self.exp.is_real
+        try:
+            f = lambdify(x, self.get_sympy_exp(), "numpy")
+        except:
+            return False
+
+        numeric = 0.12345
+        while numeric < 1000:
+            try:
+                value = f(numeric)
+                if np.isfinite(value) and np.isreal(value):
+                    return True
+            except:
+                pass
+            numeric = numeric * 10
+
+        return False
 
     def __str__(self):
         try:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .constants import *
-from .utils import *
+from .gen_utils import *
 from .node import *
 from sympy import *
 import numpy as np
@@ -16,41 +16,24 @@ class Tree(object):
         random_generate=False,
         internal_node_size=None,
         always_valid=False,
-        function_of_x=False,
     ):
         self.simplified_exp = None
         if random_generate:
+            # self.root = Node(x)
             self.root = generate_random_tree()
-            if function_of_x:
-                self.replace_random_leaf(data=x)
             if always_valid:
                 while not self.is_valid():
                     self.root = generate_random_tree()
-                    if function_of_x:
-                        self.replace_random_leaf(data=x)
         else:
             # Make sure that root is valid node
             assert type(root) is Node
-            if function_of_x:
-                assert root.has_symbols()
             self.root = root
 
     def is_valid(self):
         """
-        Check validity of expression whether it contains invalid value (complex value or infinity or undefined)
+        Check validity of expression whether it contains invalid value (complex value or infinity or nan or undefined)
         """
-
-        return (
-            self.root.is_real()
-            and (not "oo" in str(self.get_sympy_exp()))
-            and (not "nan" in str(self.get_sympy_exp()))
-        )
-        # res = True
-        # for node in reversed(traverse_in_preorder(self.root)):
-        #     if node.is_real() == False:  # it can be None when variable x is involved
-        #         res = False
-        #         break
-        # return res
+        return self.root.is_real()
 
     def get_sympy_exp(self):
         return self.root.get_sympy_exp()
@@ -63,14 +46,16 @@ class Tree(object):
         leaf_node = np.random.choice(leaf_node_list)
         leaf_node.set(data)
 
-    def get_input(self):
-        return str(
-            Tree(transform(str(simplify(diff(self.get_sympy_exp()))).replace(" ", "")))
-        )
+    def get_simplified_derivative(self):
+        derivative = diff(self.get_sympy_exp())
+        return str(simplify(derivative, ratio=oo)).replace(" ", "").strip()
 
-    def get_output(self):
-        return str(Tree(transform(str(self.get_sympy_exp()).replace(" ", ""))))
+    def get_simplified_without_constant(self):
+        expr_without_constant = separate_constant_term(self.get_sympy_exp(), var=x)[1]
+        return str(simplify(expr_without_constant, ratio=oo)).replace(" ", "").strip()
 
     def __str__(self):
+        # traverse = traverse_in_preorder(self.root)
+        # return ",".join([str(node) for node in traverse]) + "----" + str(len(traverse))
         return ",".join([str(node) for node in traverse_in_preorder(self.root)])
 

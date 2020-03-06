@@ -26,28 +26,30 @@ def Div(arg1, arg2):
     return Mul(arg1, 1 / arg2)
 
 
-x, y = symbols("x y", positive=True)
+x, y = symbols("x y", positive=True, nonzero=True, real=True)
 
 # for output data
-terminals = [x, S(-5), S(-4), S(-3), S(-2), S(-1), S(1), S(2), S(3), S(4), S(5)]
-binary_operations = [Add, Sub, Mul, Div]
-unary_operations = [
-    exp,
-    log,
-    sqrt,
-    sin,
-    cos,
-    tan,
-    asin,
-    acos,
-    atan,
-    sinh,
-    cosh,
-    tanh,
-    asinh,
-    acosh,
-    atanh,
-]
+terminals = set([x, S(-5), S(-4), S(-3), S(-2), S(-1), S(1), S(2), S(3), S(4), S(5)])
+binary_operations = set([Add, Sub, Mul, Div])
+unary_operations = set(
+    [
+        exp,
+        log,
+        sqrt,
+        sin,
+        cos,
+        tan,
+        asin,
+        acos,
+        atan,
+        sinh,
+        cosh,
+        tanh,
+        asinh,
+        acosh,
+        atanh,
+    ]
+)
 
 max_internal_node_size = 15
 
