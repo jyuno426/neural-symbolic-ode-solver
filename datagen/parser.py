@@ -18,14 +18,9 @@ warnings.filterwarnings("error")
 
 
 def parse_raw_data(internal_node_size, data_type):
-    if data_type == "integration":
-        timeout = 5
-    else:
-        timeout = 10
-
     while True:
         try:
-            with time_limit(timeout):
+            with time_limit(5):
                 tree = Tree(
                     data_type=data_type,
                     random_generate=True,
@@ -35,10 +30,12 @@ def parse_raw_data(internal_node_size, data_type):
                 output_string = normalize(tree.output)
             break
         except TimeoutException:
+            slack_message("Timeout: ", data_type)
             # print("\rTimed out! Restart!\n")
             continue
         except:
-            # print(traceback.format_exc())
+            slack_message(data_type + " error occured:")
+            print(traceback.format_exc())
             # raise Exception()
             # print("\rException occured:", e, "\n")
             continue

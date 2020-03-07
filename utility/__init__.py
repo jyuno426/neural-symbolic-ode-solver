@@ -25,6 +25,7 @@ def time_limit(seconds):
 
     signal.signal(signal.SIGALRM, signal_handler)
     signal.alarm(seconds)
+
     try:
         yield
     finally:
