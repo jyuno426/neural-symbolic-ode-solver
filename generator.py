@@ -7,47 +7,20 @@ import time
 import sys
 
 
-def generator(data_type, dataset_path, date, internal_node_size, n=int(2e4)):
+def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
 
     start_time = time.time()
     slack_message("Start " + data_type + " dataset generation: n=" + str(n))
 
-    input_raw = (
-        dataset_path
-        + "/raw-"
-        + data_type
-        + "-input-"
-        + str(internal_node_size)
-        + "-"
-        + date
-    )
+    input_raw = dataset_path + "/raw-" + data_type + "-input-" + str(internal_node_size)
     output_raw = (
-        dataset_path
-        + "/raw-"
-        + data_type
-        + "-output-"
-        + str(internal_node_size)
-        + "-"
-        + date
+        dataset_path + "/raw-" + data_type + "-output-" + str(internal_node_size)
     )
-
     input_final = (
-        dataset_path
-        + "/final-"
-        + data_type
-        + "-input-"
-        + str(internal_node_size)
-        + "-"
-        + date
+        dataset_path + "/final-" + data_type + "-input-" + str(internal_node_size)
     )
     output_final = (
-        dataset_path
-        + "/final-"
-        + data_type
-        + "-output-"
-        + str(internal_node_size)
-        + "-"
-        + date
+        dataset_path + "/final-" + data_type + "-output-" + str(internal_node_size)
     )
 
     try:
@@ -162,9 +135,9 @@ def generator(data_type, dataset_path, date, internal_node_size, n=int(2e4)):
 
 
 if __name__ == "__main__":
-    today = date.today().strftime("%b-%d-%Y")
+    today = date.today().strftime("%Y-%m-%d")
     internal_node_size = max_internal_node_size
-    dataset_path = "./dataset"
+    dataset_path = "./dataset/" + today
     data_type = "integration"
     data_cnt = int(2e4)
 
@@ -192,7 +165,6 @@ if __name__ == "__main__":
 
     generator(
         n=data_cnt,
-        date=today,
         data_type=data_type,
         dataset_path=dataset_path,
         internal_node_size=internal_node_size,
