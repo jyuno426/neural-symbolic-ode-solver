@@ -35,7 +35,7 @@ def parse_raw_data(internal_node_size, data_type):
             continue
         except:
             slack_message(data_type + " error occured:")
-            print(traceback.format_exc())
+            slack_message(traceback.format_exc())
             # raise Exception()
             # print("\rException occured:", e, "\n")
             continue
