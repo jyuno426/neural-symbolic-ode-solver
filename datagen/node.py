@@ -11,6 +11,8 @@ __all__ = ["Node"]
 class Node(object):
     def __init__(self, data=None):
         self.data = data
+        self.symbols = set()
+        self.parent = None
         self.children = []
         self.exp = None
 
@@ -26,49 +28,32 @@ class Node(object):
         else:
             new_child = Node(data)
         self.children.append(new_child)
+        new_child.parent = self
         return new_child
 
     def set(self, data):
         self.data = data
 
-    def get_sympy_exp(self):
+    def get_sympy_exp(self, re_calculate=False):
         """
         Get its expression as sympy object
         """
-        if self.exp is None:
-            if self.data in terminals:
-                self.exp = self.data
-            elif self.data in unary_operations:
-                self.exp = self.data(self.children[0].get_sympy_exp())
+        if self.exp is None or re_calculate:
+            # if self.data in terminals:
+            #     self.exp = self.data
+            if self.data in unary_operations:
+                self.exp = self.data(self.children[0].get_sympy_exp(re_calculate))
             elif self.data in binary_operations:
                 self.exp = self.data(
-                    self.children[0].get_sympy_exp(), self.children[1].get_sympy_exp()
+                    self.children[0].get_sympy_exp(re_calculate),
+                    self.children[1].get_sympy_exp(re_calculate),
                 )
             else:
-                raise Exception("get_sympy_exp error, invalid data: " + str(self.data))
+                # terminals
+                self.exp = self.data
+                # raise Exception("get_sympy_exp error, invalid data: " + str(self.data))
 
         return self.exp
-
-    def has_symbols(self):
-        return len(self.get_sympy_exp().free_symbols) > 0
-
-    def is_real(self):
-        try:
-            f = lambdify(x, self.get_sympy_exp(), "numpy")
-        except:
-            return False
-
-        numeric = 0.12345
-        while numeric < 1000:
-            try:
-                value = f(numeric)
-                if np.isfinite(value) and np.isreal(value):
-                    return True
-            except:
-                pass
-            numeric = numeric * 10
-
-        return False
 
     def __str__(self):
         try:

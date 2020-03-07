@@ -1,17 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from datagen import constants, parser, tree, gen_utils, gen_integration
-from .gen_integration import *
-from .constants import *
+from datagen import gen_utils, constants, parser, tree
 from .gen_utils import *
+from .constants import *
 from .parser import *
 from .tree import *
 
 
-__all__ = (
-    constants.__all__
-    + tree.__all__
-    + parser.__all__
-    + gen_utils.__all__
-    + gen_integration.__all__
-)
+__all__ = gen_utils.__all__ + constants.__all__ + parser.__all__ + tree.__all__

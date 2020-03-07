@@ -5,11 +5,17 @@ from sympy import *
 __all__ = [
     "Sub",
     "Div",
+    "square",
     "x",
-    "y",
+    "f",
+    "g",
+    "h",
+    "c1",
+    "c2",
     "terminals",
     "binary_operations",
     "unary_operations",
+    "inverse_mapping",
     "max_internal_node_size",
     "symbol_to_unary_operation",
     "symbol_to_binary_operation",
@@ -26,7 +32,15 @@ def Div(arg1, arg2):
     return Mul(arg1, 1 / arg2)
 
 
-x, y = symbols("x y", positive=True, nonzero=True, real=True)
+def square(arg1):
+    return Mul(arg1, arg1)
+
+
+x = Symbol("x", positive=True, nonzero=True, real=True)
+c1, c2 = symbols("c1 c2", real=True)
+f = Function("f")(x)
+g = Function("g")(x)
+h = Function("h")(x)
 
 # for output data
 terminals = set([x, S(-5), S(-4), S(-3), S(-2), S(-1), S(1), S(2), S(3), S(4), S(5)])
@@ -36,6 +50,7 @@ unary_operations = set(
         exp,
         log,
         sqrt,
+        # square,
         sin,
         cos,
         tan,
@@ -52,6 +67,25 @@ unary_operations = set(
 )
 
 max_internal_node_size = 15
+
+inverse_mapping = {
+    "exp": log,
+    "log": exp,
+    "sqrt": square,
+    # "square": sqrt,
+    "sin": asin,
+    "cos": acos,
+    "tan": atan,
+    "asin": sin,
+    "acos": cos,
+    "atan": tan,
+    "sinh": asinh,
+    "cosh": acosh,
+    "tanh": atanh,
+    "asinh": sinh,
+    "acosh": cosh,
+    "atanh": tanh,
+}
 
 # operation_name_to_symbol = {
 #     "Add": "+",

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from utility import *
 from .constants import *
 from .gen_utils import *
 from .node import *
@@ -13,17 +14,41 @@ class Tree(object):
     def __init__(
         self,
         root=None,
-        always_valid=False,
         random_generate=False,
         internal_node_size=None,
+        data_type="integration",
     ):
-        self.simplified_exp = None
+        self.root = None
+
         if random_generate:
-            # self.root = Node(x)
-            self.root = generate_random_tree(internal_node_size)
-            if always_valid:
+            if data_type == "integration":
                 while not self.is_valid():
                     self.root = generate_random_tree(internal_node_size)
+                self.input = simplify(diff(self.get_sympy_exp()))
+                self.output = simplify(self.drop_number())
+
+            elif data_type == "ode1":
+                simplified = None
+                while True:
+                    self.root = generate_random_tree(internal_node_size)
+                    if not self.is_valid():
+                        continue
+
+                    leaf_node = self.get_random_leaf_except()
+                    leaf_node.set(c1)
+
+                    self.get_sympy_exp(re_calculate=True)
+                    simplified = simplify(self.drop_number())
+                    if "c1" in normalize(simplified):
+                        break
+
+                self.output = simplify_coefficient(simplified, c1, x)
+                expr = solve_by_symb(Sub(self.output, f), c1)
+                self.input = fraction(simplify(expr.diff(x)))[0]
+
+            elif data_type == "ode2":
+                pass
+
         else:
             # Make sure that root is valid node
             assert type(root) is Node
@@ -31,28 +56,30 @@ class Tree(object):
 
     def is_valid(self):
         """
-        Check validity of expression whether it contains invalid value (complex value or infinity or nan or undefined)
+        Check validity of expression whether it contains invalid
+        value (complex value or infinity or nan or undefined)
         """
-        return self.root.is_real()
+        if self.root is None:
+            return False
+        else:
+            return is_real(self.get_sympy_exp())
 
-    def get_sympy_exp(self):
-        return self.root.get_sympy_exp()
+    # def has_symbol(self, symb):
+    #     return self.root.has_symbol(symb)
 
-    def replace_random_leaf(self, data):
-        assert data in terminals
+    def get_sympy_exp(self, re_calculate=False):
+        return self.root.get_sympy_exp(re_calculate)
+
+    def get_random_leaf_except(self, exception=[]):
         leaf_node_list = [
-            node for node in traverse_in_preorder(self.root) if node.is_leaf()
+            node
+            for node in traverse_in_preorder(self.root)
+            if node.is_leaf() and node.data not in exception
         ]
-        leaf_node = np.random.choice(leaf_node_list)
-        leaf_node.set(data)
+        return np.random.choice(leaf_node_list)
 
-    def get_simplified_derivative(self):
-        derivative = diff(self.get_sympy_exp())
-        return str(simplify(derivative)).replace(" ", "").strip()
-
-    def get_simplified_without_constant(self):
-        expr_without_constant = separate_constant_term(self.get_sympy_exp(), var=x)[1]
-        return str(simplify(expr_without_constant)).replace(" ", "").strip()
+    def drop_number(self):
+        return separate_constant_term(self.get_sympy_exp(), var=[x, c1, c2])[1]
 
     def __str__(self):
         # traverse = traverse_in_preorder(self.root)

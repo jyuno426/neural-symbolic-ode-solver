@@ -5,7 +5,13 @@ from datetime import timedelta
 import signal
 import slack
 
-__all__ = ["time_limit", "TimeoutException", "print_progress_bar", "slack_message"]
+__all__ = [
+    "time_limit",
+    "TimeoutException",
+    "print_progress_bar",
+    "slack_message",
+    "normalize",
+]
 
 
 class TimeoutException(Exception):
@@ -72,3 +78,13 @@ def slack_message(message, channel="#laboratory"):
     assert response["message"]["text"] == message
 
     # print('successfully post message "' + message + '" to ' + channel)
+
+
+def normalize(obj):
+    return (
+        str(obj)
+        .strip()
+        .replace(" ", "")
+        .replace("Derivative(f(x),x)", "g")
+        .replace("f(x)", "f")
+    )
