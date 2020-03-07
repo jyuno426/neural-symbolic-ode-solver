@@ -5,6 +5,7 @@ from datagen import *
 from utility import *
 import time
 import sys
+import os
 
 
 def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
@@ -142,6 +143,11 @@ if __name__ == "__main__":
     dataset_path = "./dataset/" + today
     data_type = "integration"
     data_cnt = int(2e4)
+
+    if not os.path.exists("./dataset/"):
+        os.makedirs("./dataset/")
+    if not os.path.exists(dataset_path):
+        os.makedirs(dataset_path)
 
     l = len(sys.argv)
 
