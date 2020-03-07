@@ -45,7 +45,8 @@ def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
         input_string, output_string = parse_raw_data(internal_node_size, data_type)
 
         if any(
-            s in (input_string + output_string) for s in ["oo", "I", "Dummy", "nan"]
+            s in (input_string + output_string)
+            for s in ["oo", "I", "Dummy", "nan", "zoo"]
         ):
             # some weired result produced when simplifying...
             continue
@@ -90,7 +91,8 @@ def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
     duplicate_check = set()
     while i < n:
         if any(
-            s in (input_list[i] + output_list[i]) for s in ["oo", "I", "Dummy", "nan"]
+            s in (input_list[i] + output_list[i])
+            for s in ["oo", "I", "Dummy", "nan", "zoo"]
         ):
             # some weired result produced when simplifying...
             i += 1
@@ -100,9 +102,9 @@ def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
             input_string, output_string = parse_data(input_list[i], output_list[i])
         except:
             i += 1
-            print("Error occured!")
-            print("input:\t", input_list[i])
-            print("output:\t", output_list[i])
+            # print("Error occured!")
+            # print("input:\t", input_list[i])
+            # print("output:\t", output_list[i])
             continue
 
         if input_string.count(",") >= 511 or output_string.count(",") >= 511:
