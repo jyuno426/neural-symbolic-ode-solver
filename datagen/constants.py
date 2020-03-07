@@ -21,6 +21,7 @@ __all__ = [
     "symbol_to_binary_operation",
     "unary_list",
     "binary_list",
+    "invalid_characters",
 ]
 
 
@@ -125,3 +126,5 @@ symbol_to_binary_operation = {
 
 unary_list = list(reversed(sorted(symbol_to_unary_operation.keys())))
 binary_list = list(reversed(sorted(symbol_to_binary_operation.keys())))
+
+invalid_characters = ["oo", "I", "Dummy", "nan", "zoo"]

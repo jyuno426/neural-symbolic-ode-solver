@@ -11,6 +11,7 @@ __all__ = [
     "traverse_in_preorder",
     "match_prefix",
     "separate_constant_term",
+    "has_invalid",
     "is_real",
     "solve_by_symb",
     "simplify_coefficient",
@@ -157,7 +158,7 @@ def match_prefix(sentence, candidates):
             break
     if prefix is None:
         # print("It contains", sentence, "\n")
-        raise Exception("match_prefix error")
+        raise Exception("match_prefix error " + sentence)
     else:
         return prefix
 
@@ -169,11 +170,15 @@ def separate_constant_term(expr, var=None):
         return expr.as_independent(*var, as_Add=True)
 
 
+def has_invalid(string):
+    return any(s in string for s in invalid_characters)
+
+
 def is_real(expr):
     try:
         ftn = lambdify(x, expr, "numpy")
     except:
-        return False
+        return not has_invalid(normalize(expr))
 
     numeric = 0.12345
     while numeric < 1000:
@@ -209,7 +214,7 @@ def simplify_coefficient(expr, const, var):
         return expr
 
 
-def solve_by_symb(expr, symb):
+def solve_by_symb(expr, symb, origins):
     root = standard_to_tree(normalize(expr))
     # for kk in traverse_in_preorder(root):
     #     print(kk)
@@ -220,10 +225,13 @@ def solve_by_symb(expr, symb):
     node = root
 
     exp = S(0)
+    trace = []
     while node.data != symb:
+        trace.append(str(node))
         assert symb in node.symbols
 
         if str(node) in inverse_mapping:
+            # unary
             exp = inverse_mapping[str(node)](exp)
             node = node.children[0]
 
@@ -267,8 +275,25 @@ def solve_by_symb(expr, symb):
                 exp = Div(left.get_sympy_exp(), exp)
                 node = right
 
+        # elif node.data == Pow:
+        #     left = node.children[0]
+        #     right = node.children[1]
+        #     # symbol cannot be in exponent(=right side)
+        #     assert symb in left.symbols
+        #     exp =
         else:
-            raise Exception("solve error")
+            raise Exception(
+                "solve error:\ntrace: "
+                + str(trace)
+                + "\noriginal: "
+                + str(origins[0])
+                + "\nconverted: "
+                + str(origins[1])
+                + "\nsimplified: "
+                + str(origins[2])
+                + "\noutput: "
+                + str(expr)
+            )
 
     return exp
 
@@ -466,7 +491,8 @@ def standard_to_tree(string_expression):
             except:
                 pass
 
-        assert check
+        if not check:
+            raise Exception("standard_to_tree error:\nexpr: " + string_expression)
 
     # print("root:", root, ", children:", [str(child) for child in root.children])
     return root

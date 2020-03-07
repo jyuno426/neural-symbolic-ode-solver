@@ -43,13 +43,15 @@ class Node(object):
             #     self.exp = self.data
             if self.data in unary_operations:
                 self.exp = self.data(self.children[0].get_sympy_exp(re_calculate))
-            elif self.data in binary_operations:
+            elif self.data in binary_operations or self.data == Pow:
                 self.exp = self.data(
                     self.children[0].get_sympy_exp(re_calculate),
                     self.children[1].get_sympy_exp(re_calculate),
                 )
             else:
                 # terminals
+                # if self.data not in terminals:
+                #     print(self.data)
                 self.exp = self.data
                 # raise Exception("get_sympy_exp error, invalid data: " + str(self.data))
 

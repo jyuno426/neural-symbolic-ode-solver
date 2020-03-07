@@ -10,7 +10,7 @@ import sys
 def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
 
     start_time = time.time()
-    slack_message("Start " + data_type + " dataset generation: n=" + str(n))
+    slack_message("Start " + data_type + " dataset generation: n=" + str(n), data_type)
 
     input_raw = dataset_path + "/raw-" + data_type + "-input-" + str(internal_node_size)
     output_raw = (
@@ -36,18 +36,16 @@ def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
 
     assert i == j
 
+    slack_message("current_cnt: " + str(i), data_type)
+
     if n < i:
         n = i
-        print("current_cnt:", n)
 
     # parse to sympy format
     while i < n:
         input_string, output_string = parse_raw_data(internal_node_size, data_type)
 
-        if any(
-            s in (input_string + output_string)
-            for s in ["oo", "I", "Dummy", "nan", "zoo"]
-        ):
+        if any(s in (input_string + output_string) for s in invalid_characters):
             # some weired result produced when simplifying...
             continue
 
@@ -70,7 +68,7 @@ def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
         )
 
         if i % 1000 == 0:
-            slack_message(message)
+            slack_message(message, data_type)
 
     # parse to our format
     f = open(input_raw, "r")
@@ -90,10 +88,7 @@ def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
     total_cnt = 0
     duplicate_check = set()
     while i < n:
-        if any(
-            s in (input_list[i] + output_list[i])
-            for s in ["oo", "I", "Dummy", "nan", "zoo"]
-        ):
+        if any(s in (input_list[i] + output_list[i]) for s in invalid_characters):
             # some weired result produced when simplifying...
             i += 1
             continue
@@ -132,12 +127,13 @@ def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
         )
 
         if i % 10000 == 0:
-            slack_message(message)
+            slack_message(message, data_type)
 
     f.close()
     g.close()
 
     print("total_cnt:", total_cnt)
+    slack_message("total_cnt: " + str(total_cnt), data_type)
 
 
 if __name__ == "__main__":

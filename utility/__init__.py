@@ -73,10 +73,17 @@ def slack_message(message, channel="#laboratory"):
     )
 
     client = slack.WebClient(token=token)
-    response = client.chat_postMessage(channel=channel, text=message)
 
-    assert response["ok"]
-    assert response["message"]["text"] == message
+    count = 0
+
+    while count < 5:
+        try:
+            response = client.chat_postMessage(channel=channel, text=message)
+            if response["ok"] and response["message"]["text"] == message:
+                break
+        except:
+            count += 1
+            pass
 
     # print('successfully post message "' + message + '" to ' + channel)
 

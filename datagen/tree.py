@@ -28,23 +28,30 @@ class Tree(object):
                 self.output = simplify(self.drop_number())
 
             elif data_type == "ode1":
+                original = None
+                converted = None
                 simplified = None
                 while True:
                     self.root = generate_random_tree(internal_node_size)
-                    if not self.is_valid():
-                        continue
-
+                    original = self.get_sympy_exp()
                     leaf_node = self.get_random_leaf_except()
                     leaf_node.set(c1)
-
-                    self.get_sympy_exp(re_calculate=True)
+                    converted = self.get_sympy_exp(re_calculate=True)
                     simplified = simplify(self.drop_number())
-                    if "c1" in normalize(simplified):
+
+                    str_exp = normalize(simplified)
+                    if "c1" in str_exp and not has_invalid(str_exp):
                         break
 
                 self.output = simplify_coefficient(simplified, c1, x)
-                expr = solve_by_symb(Sub(self.output, f), c1)
-                self.input = fraction(simplify(expr.diff(x)))[0]
+                expr = solve_by_symb(
+                    Sub(self.output, f),
+                    c1,
+                    [str(original), str(converted), str(simplified)],
+                )
+
+                diff_eq = simplify(expr.diff(x))
+                self.input = fraction(diff_eq)[0]  # remove unnecessary denomiter
 
             elif data_type == "ode2":
                 pass
