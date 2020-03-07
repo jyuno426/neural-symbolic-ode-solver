@@ -45,15 +45,15 @@ def parse_raw_data(internal_node_size, data_type):
             break
         except TimeoutException:
             parse_raw_data_timeout_cnt += 1
-            slack_message(
-                "Timeout: "
-                + data_type
-                + ", "
-                + str(parse_raw_data_timeout_cnt)
-                + "/"
-                + str(parse_raw_data_total_cnt),
-                data_type,
-            )
+            # slack_message(
+            #     "Timeout: "
+            #     + data_type
+            #     + ", "
+            #     + str(parse_raw_data_timeout_cnt)
+            #     + "/"
+            #     + str(parse_raw_data_total_cnt),
+            #     data_type,
+            # )
             # print("\rTimed out! Restart!\n")
             continue
         except Exception as e:
