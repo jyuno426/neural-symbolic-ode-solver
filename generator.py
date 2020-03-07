@@ -44,7 +44,9 @@ def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
     while i < n:
         input_string, output_string = parse_raw_data(internal_node_size, data_type)
 
-        if any(s in (input_string + output_string) for s in ["oo", "I", "Dummy"]):
+        if any(
+            s in (input_string + output_string) for s in ["oo", "I", "Dummy", "nan"]
+        ):
             # some weired result produced when simplifying...
             continue
 
@@ -87,7 +89,9 @@ def generator(data_type, dataset_path, internal_node_size, n=int(2e4)):
     total_cnt = 0
     duplicate_check = set()
     while i < n:
-        if any(s in (input_list[i] + output_list[i]) for s in ["oo", "I", "Dummy"]):
+        if any(
+            s in (input_list[i] + output_list[i]) for s in ["oo", "I", "Dummy", "nan"]
+        ):
             # some weired result produced when simplifying...
             i += 1
             continue
