@@ -156,7 +156,7 @@ def match_prefix(sentence, candidates):
             prefix = candidate
             break
     if prefix is None:
-        print("It contains", sentence, "\n")
+        # print("It contains", sentence, "\n")
         raise Exception("match_prefix error")
     else:
         return prefix
